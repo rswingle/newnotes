@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-#!/usr/bin/env pypy
-
 # 2011-06-02
 # Daniel B. Rollings
 # Edited by Ray Swingle
