@@ -536,13 +536,13 @@ class Scale(Named, CyclicList):
             oScale.build(oParentScale)
             oScale.adjust(lArgs)
             oScale.setLengthByBits()
-            oScale.setName(', '.join([sName] + list(lArgs)))
+            oScale.setName('\n'.join([sName] + list(lArgs)))
 
             # Set the description with respect to the base and elements
             lDesc = [ str.capitalize(oScale.name()) ]
             if oParentScale is not EqualTempered:
                 lDesc.append('based on %s tuning' % (oParentScale.name()))
-            oScale.setDescription(', '.join(lDesc))
+            oScale.setDescription('\n'.join(lDesc))
 
             return oScale
         
@@ -790,7 +790,7 @@ class QuarterScale(Scale):
         l = self.getParent()
         names = l.getNoteNames()
         scaleName = '%s %s' % (names[rootNote], self.name())
-        scaleDetails = ', '.join([ '%-2s' % (names[i.offset + rootNote]) for i in l if self.has(i.offset) ])
+        scaleDetails = ' '.join([ '%-2s' % (names[i.offset + rootNote]) for i in l if self.has(i.offset) ])
         return '%-20s %s' % (scaleName, scaleDetails)
 
 
@@ -1760,7 +1760,7 @@ def getArgsParser():
         help = "Display only scales", default = False)
     args_parser.add_option("-F", "--family", action = "store", dest = "family", type="string",
         help = "Display scales of a family, available types %s" % 
-        (', '.join(set([str(i[3]) for i in list(dScaleRecipes.values()) if i[3] is not None])))
+        (' '.join(set([str(i[3]) for i in list(dScaleRecipes.values()) if i[3] is not None])))
         , default = None)
     args_parser.add_option("-A", "--all-scales", action = "store_true", dest = "all_scales",
         help = "Display all scales", default = False)
@@ -1932,30 +1932,31 @@ def main():
 
     # Are we pulling fingercharts for whatever instruments?
 
-    lSequences = ', '.join(args).split(',')
+    lSequences = ' '.join(args).split(',')
     if len(args) >= 1:
         lOutput = []
         if not options.chordsOnly:  
             for key in lActiveKeys:
                 lMatches, root = ParseNoteSequences( lSequences, key, lActiveScales )
                 if len(lMatches) > 0:
-                    lOutput.append(', '.join([s.shortList(root) for s in lMatches]))
+                    lOutput.append(' '.join([s.shortList(root) for s in lMatches]))
                     print("\n\t")
 
             if len(lOutput):
                 print("Matches scales:\n\t")
-                print(', '.join(lOutput))
+                print('\n'.join(lOutput))
                 print("\n\t")
-                print()
+                #print()
 
             for scale in lMatches:
                 for instrument in lInstruments:
                     print(scale.shortList(key))
-                    print("\n")
+                    print("\n\t")
+                    print()
                     if options.intervals:
-                        print((instrument.playIntervals(scale, key, options.numFrets)))
+                        print((instrument.playIntervals(scale, key, options.numFrets), '\n\t'))
                     else:
-                        print((instrument.play(scale, key, options.numFrets)))
+                        print((instrument.play(scale, key, options.numFrets), '\n\t'))
 
         for lNotes in lSequences:
             if len(lNotes) <= 1:    continue
@@ -1968,12 +1969,12 @@ def main():
                     
                         if options.fingercharts:
                             for scale in lMatches:
-                                print((scale.shortList(key)))
+                                print((scale.shortList(key), '\n\t'))
                                 for instrument in lInstruments:
                                     if options.intervals:
-                                        print((instrument.playIntervals(scale, key, options.numFrets)))
+                                        print((instrument.playIntervals(scale, key, options.numFrets), '\n\t'))
                                     else:
-                                        print((instrument.play(scale, key, options.numFrets)))
+                                        print((instrument.play(scale, key, options.numFrets), '\n\t'))
 
                 if len(lOutput):
                     print(("Matches chords:\n\t%s" % (join(lOutput, '\n\t'))))
