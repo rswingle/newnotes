@@ -11,7 +11,6 @@ Fix output formatting
 
 Example usage: ./newnotes.py E,A,B
 
-./newnotes.py --help:
 ```
 Usage: newnotes.py [options]
 Options:
