@@ -13,7 +13,7 @@ Example usage: ./newnotes.py E,A,B
 
 ./newnotes.py --help:
 Usage: newnotes.py [options]
-<code>
+<list>
 Options:
   -h, --help            show this help message and exit
   -s SCALES, --scales=SCALES
@@ -43,4 +43,4 @@ Options:
   --shell               Interactive shell
   --fractional=FRACTIONAL
                         Make a fractional scale with denominator up to this
-</code>
+</list>
