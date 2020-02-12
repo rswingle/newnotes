@@ -41,7 +41,8 @@ Options:
                         Make a fractional scale with denominator up to this
 ```
 
-```Example Usage "./newnotes.py E,A,B" will produce:
+```
+Example Usage "./newnotes.py E,A,B" will produce:
 Matches scales:
         C major              C  D  E  F  G  A  B  C
         Db minor             Db Eb E  Gb Ab A  B  Db
