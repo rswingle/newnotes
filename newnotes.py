@@ -45,7 +45,7 @@ def reduceFraction(num, den):
     if abs(num) < abs(den):		smaller = abs(num)
     else:						smaller = abs(den)
 
-    l = range(2, smaller+1)
+    l = list(range(2, smaller+1))
     l.reverse()
 
     i = smaller+1
@@ -83,16 +83,16 @@ class Named:
     def name(self):
         if self.lNames is None:
             return ''
-        if type(self.lNames) is tuple or type(self.lNames) is list:
+        if isinstance(self.lNames, tuple) or isinstance(self.lNames, list):
             return join(self.lNames)
         return self.lNames
         
     def setName(self, *lNames):
-        if type(lNames) is str:
+        if isinstance(lNames, str):
             if lNames != '':
                 self.lNames = (lNames)
-        elif type(lNames) is tuple or type(lNames) is list:
-            if type(lNames[0]) is tuple or type(lNames[0]) is list and lNames[0] and lNames[0] != '':
+        elif isinstance(lNames, tuple) or isinstance(lNames, list):
+            if isinstance(lNames[0], tuple) or isinstance(lNames[0], list) and lNames[0] and lNames[0] != '':
                 self.lNames = lNames[0]
             elif lNames[0] != '' and lNames[0] is not None:
                 self.lNames = lNames[0]
@@ -101,7 +101,7 @@ class Named:
         self.description = d
         
     def getDescription(self):
-        if self.__dict__.has_key('description'):
+        if 'description' in self.__dict__:
             return self.description
         else:
             return self.name()
@@ -154,11 +154,11 @@ class Note(Named):
         try:    
             noteName = args[0].name()
         except: 
-            if len(args) > 1 and type(args[0]) is int and type(args[1]) is int:
+            if len(args) > 1 and isinstance(args[0], int) and isinstance(args[1], int):
                 n = args[0]
                 d = args[1]
                 noteName = '%s/%s' % (n, d)
-            elif type(args[0]) is tuple:
+            elif isinstance(args[0], tuple):
                 n = args[0][0]
                 d = args[0][1]
                 noteName = '%s/%s' % (n, d)
@@ -167,10 +167,10 @@ class Note(Named):
                 n = args[0]
 
         # If we have already generated this note, use it - we're treating notes like singletons
-        if Note.dNotes.has_key(noteName):
+        if noteName in Note.dNotes:
             return Note.dNotes[noteName]
 
-        if type(args[-1]) is str:
+        if isinstance(args[-1], str):
             desc = args[-1]
         else:
             desc = ''
@@ -303,7 +303,7 @@ class Scale(Named, CyclicList):
         self.dNoteMapping = d
         
     def getNoteMapping(self):
-        if self.__class__.__dict__.has_key('dNoteMapping'):
+        if 'dNoteMapping' in self.__class__.__dict__:
             return self.__class__dNoteMapping
         return self.dNoteMapping
 
@@ -404,7 +404,7 @@ class Scale(Named, CyclicList):
         s.strip(' ')
         s = re.sub(r'([A-G][b#kr]{0,2})', r' \1', s)
         
-        lSplit = split(s)
+        lSplit = str.split(s)
         flags = 0
         
         for intervalName in lSplit:
@@ -421,7 +421,7 @@ class Scale(Named, CyclicList):
         s.strip(' ')
         s = re.sub(r'([A-G][b#kr]{0,2})', r' \1', s)
         
-        lSplit = split(s)
+        lSplit = str.split(s)
         flags = 0
         
         dNamesToSemitones = oParent.getNoteMapping()
@@ -434,14 +434,14 @@ class Scale(Named, CyclicList):
             else:
                 dOutput[len(oParent) - 1 + note - root] = None
 
-        return dOutput.keys()
+        return list(dOutput.keys())
 
     def parseNotesToOffsetList(self, s, root):
         oParent = self.getParent()
         s.strip(' ')
         s = re.sub(r'([A-G][b#]?)', r' \1', s)
         
-        lSplit = split(s)
+        lSplit = str.split(s)
         flags = 0
         
         dNamesToSemitones = oParent.getNoteMapping()
@@ -471,7 +471,7 @@ class Scale(Named, CyclicList):
         mod = 0
         note = 0
         for i in intervalName:
-            if dNamesToSemitones.has_key(i):
+            if i in dNamesToSemitones:
                 note = dNamesToSemitones[i]
                 continue
             mod += dIntervalShifters[i]                    
@@ -522,9 +522,9 @@ class Scale(Named, CyclicList):
         This is intended to be the focal point for building scales.
         '''
     
-        if Scale.dScales.has_key(sName):
+        if sName in Scale.dScales:
             return Scale.dScales[sName]
-        elif dScaleRecipes.has_key(sName):
+        elif sName in dScaleRecipes:
             oClass, oDefaultParent, lModes, family = dScaleRecipes[sName]
             
             # lArgs = list(lModes + lArgs)
@@ -536,17 +536,17 @@ class Scale(Named, CyclicList):
             oScale.build(oParentScale)
             oScale.adjust(lArgs)
             oScale.setLengthByBits()
-            oScale.setName(join([sName] + list(lArgs)))
+            oScale.setName(', '.join([sName] + list(lArgs)))
 
             # Set the description with respect to the base and elements
-            lDesc = [ capitalize(oScale.name()) ]
+            lDesc = [ str.capitalize(oScale.name()) ]
             if oParentScale is not EqualTempered:
                 lDesc.append('based on %s tuning' % (oParentScale.name()))
-            oScale.setDescription(join(lDesc))
+            oScale.setDescription(', '.join(lDesc))
 
             return oScale
         
-        raise KeyError, "Invalid scale specified %s" % (sName)
+        raise KeyError("Invalid scale specified %s" % (sName))
         return None
 
     def scalaOutput(self, bDescription = 0):
@@ -564,6 +564,7 @@ class Scale(Named, CyclicList):
         lOutput.append(lNotes[-1].scalaOutput())
 
         return join(lOutput, '\n')
+        print('\n')
 
     def thumbjamOutput(self):
         lNotes = self.getParent()
@@ -620,10 +621,10 @@ class Scale(Named, CyclicList):
     def __eq__(self, other):            return self.flags == other
 
     def setAll(self, num):
-        self.flags = long(num)
+        self.flags = int(num)
 
     def clearAll(self):
-        self.flags = long(0)
+        self.flags = int(0)
 
     def has(self, num):
         if self.flags:
@@ -641,7 +642,7 @@ class Scale(Named, CyclicList):
             self.flags ^= (1 << num)
 
     def rotateRight(self, shiftBy):
-        mask = (2L**shiftBy) - 1
+        mask = (2**shiftBy) - 1
         bitMask = self.flags & mask  
         self.flags = (self.flags >> shiftBy) | (bitMask << (self.length - shiftBy))
         return self.flags
@@ -691,9 +692,9 @@ class Chord(Scale):
         This is intended to be the focal point for building scales.
         '''
     
-        if Chord.dChords.has_key(sName):
+        if sName in Chord.dChords:
             return Chord.dChords[sName]
-        elif dChordRecipes.has_key(sName):
+        elif sName in dChordRecipes:
             lArgs = dChordRecipes[sName]
             
             # lArgs = list(lModes + lArgs)
@@ -715,7 +716,7 @@ class Chord(Scale):
 
             return oChord
         
-        raise KeyError, "Invalid scale specified %s" % (sName)
+        raise KeyError("Invalid scale specified %s" % (sName))
         return None
 
 
@@ -749,7 +750,7 @@ class QuarterScale(Scale):
     lIntervalNumbersToOffsets = CyclicList(( 0, 4, 8, 10, 14, 18, 22 ))
     lCircleOfFifths = CyclicList(( 0, 14, 4, 18, 8, 22, 12, 2, 16, 6, 20, 10 ))
     # lIntervalsToBitPositions = CyclicList(( 0, 5, 9, 11, 15, 19, 23 ))
-    lSubsetIntervals = CyclicList(range(0, 25))
+    lSubsetIntervals = CyclicList(list(range(0, 25)))
     
     # This takes a parent scale and a tuple of string arguments to run through adjust()
     def adjust(self, lStrings):
@@ -757,13 +758,13 @@ class QuarterScale(Scale):
         lAdjusts = []
 
         for s in dModes[self.name()][2]:
-            if dModes.has_key(s):
+            if s in dModes:
                 lAdjusts += list(dModes[s][2])
             else:
                 lAdjusts.append(s)
 
         for s in lStrings:
-            if dModes.has_key(s):
+            if s in dModes:
                 if dModes[self.name()][0] is dModes[s][0]:    # They have the same list of modes
                     scale = Scale.factory(s, self.oParentScale)
                     self.flags |= scale.flags
@@ -789,7 +790,7 @@ class QuarterScale(Scale):
         l = self.getParent()
         names = l.getNoteNames()
         scaleName = '%s %s' % (names[rootNote], self.name())
-        scaleDetails = join([ '%-2s' % (names[i.offset + rootNote]) for i in l if self.has(i.offset) ], ' ')
+        scaleDetails = ', '.join([ '%-2s' % (names[i.offset + rootNote]) for i in l if self.has(i.offset) ])
         return '%-20s %s' % (scaleName, scaleDetails)
 
 
@@ -927,13 +928,13 @@ class DiatonicScale(ChromaticScale):
         lAdjusts = []
 
         for s in dModes[self.name()][2]:
-            if dModes.has_key(s):
+            if s in dModes:
                 lAdjusts += list(dModes[s][2])
             else:
                 lAdjusts.append(s)
 
         for s in lStrings:
-            if dModes.has_key(s):
+            if s in dModes:
                 if dModes[self.name()][0] is dModes[s][0]:    # They have the same list of modes
                     scale = Scale.factory(s, self.oParentScale)
                     self.flags |= scale.flags
@@ -981,7 +982,7 @@ def makeFractionalScale(ceiling=512, centsBound=2, cents=100, denominator=10935,
     lFavoredDenominators =   [2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,20,22,23,24,25,27,30,31,32,33,34,35,36,40,42,44,45,48,50,54,60,62,64,65,70,72,75,80,81,88,96,100,105,120,124,125,128 ] #,135,160,166,180,182,192,202,243,256,375,512 ]
     
     
-    import cPickle as pickle
+    import pickle as pickle
     dRatios = {}
     bNew = False
 
@@ -993,7 +994,7 @@ def makeFractionalScale(ceiling=512, centsBound=2, cents=100, denominator=10935,
             dRatios = pickle.load(serialized)
         l = dRatios[denominator]
     except:
-        l = [ reduceFraction(numerator,denominator) for numerator in xrange(denominator+1, denominator*2+1) ]
+        l = [ reduceFraction(numerator,denominator) for numerator in range(denominator+1, denominator*2+1) ]
 
         if bInverses:
             l += [ reduceFraction(i[1]*2,i[0]) for i in l ]
@@ -1698,7 +1699,7 @@ class MusicalStringInstrument(Named):
         return '%s\n  %s%s\n    %s%s' % (g_sTableStart, g_sTableHeaderStart, sHeader,  join(lOutput, '\n    ') + g_sTableEnd, g_sTableHeaderEnd)
 
     def register(self):
-        MusicalStringInstrument.dInstruments[lower(self.name())] = self
+        MusicalStringInstrument.dInstruments[str.lower(self.name())] = self
         return self
     
 
@@ -1759,7 +1760,7 @@ def getArgsParser():
         help = "Display only scales", default = False)
     args_parser.add_option("-F", "--family", action = "store", dest = "family", type="string",
         help = "Display scales of a family, available types %s" % 
-        (join(set([str(i[3]) for i in dScaleRecipes.values() if i[3] is not None]), ','))
+        (', '.join(set([str(i[3]) for i in list(dScaleRecipes.values()) if i[3] is not None])))
         , default = None)
     args_parser.add_option("-A", "--all-scales", action = "store_true", dest = "all_scales",
         help = "Display all scales", default = False)
@@ -1810,9 +1811,9 @@ def inputLoop(options, oParentScale, args, *largs, **kwargs):
     prompt = scale.scalaOutput
     scale.flags = 1<<(len(oParentScale))
 
-    while 1:
-        print prompt(bDescription = 1)
-        input = raw_input("> ")
+    while True:
+        print((prompt(bDescription = 1)))
+        input = eval(input("> "))
         if not len(input):
             continue
 
@@ -1826,7 +1827,7 @@ def inputLoop(options, oParentScale, args, *largs, **kwargs):
                 lInput = split(input)
                 scale.adjust(lInput)
             except:
-                print "ERROR"
+                print("ERROR")
 
 
 # For command-line invocation
@@ -1850,7 +1851,7 @@ def main():
     if options.fingercharts:
         for name in split(options.fingercharts, ','):
             sName = lower(name)
-            if MusicalStringInstrument.dInstruments.has_key(sName):
+            if sName in MusicalStringInstrument.dInstruments:
                 lInstruments.append(MusicalStringInstrument.dInstruments[sName])
             else:
                 lInstruments.append(MusicalStringInstrument(sName, EqualTempered, EqualTempered.parseNotesToOffsetList(name, 0)))
@@ -1872,8 +1873,7 @@ def main():
         l = tuple(l)
         lActiveScales = [ makeFractionalScale(*l) ]
     else:
-        lScaleNames = dScaleRecipes.keys()
-        lScaleNames.sort()
+        lScaleNames = sorted(dScaleRecipes.keys())
         lActiveScales = [ Scale.factory(scale, oParentScale) for scale in lScaleNames 
             if dScaleRecipes[scale][3] != 'tunings' and
             (options.all_scales or options.family == dScaleRecipes[scale][3])
@@ -1885,8 +1885,7 @@ def main():
             chord = Chord.factory(lChordNames[0], EqualTempered)
             lActiveChords.append(chord)
     elif 0: #
-        lChordNames = dChordRecipes.keys()
-        lChordNames.sort()
+        lChordNames = sorted(dChordRecipes.keys())
         lActiveChords = [ Chord.factory(chord, EqualTempered) for chord in lChordNames ]
     
     for scale in lActiveScales:
@@ -1900,13 +1899,12 @@ def main():
                 with open('%s.scl' % (scale.name().strip(' ')), 'w') as file:
                     file.write(scale.scalaOutput())
             else:               
-                print scale.scalaOutput(1)
-                print
+                print((scale.scalaOutput(1)))
+                print()
 
     if options.thumbjamOutput:
         if not len(lActiveScales):
-            l = dScaleRecipes.keys()
-            l.sort()
+            l = sorted(dScaleRecipes.keys())
             for s in l:
                 lActiveScales.append(Scale.factory(s, oParentScale, *args))
 
@@ -1924,8 +1922,8 @@ def main():
             file.write(join(lOutput, '\n'))
             file.close()
         else:
-            print join(lOutput, '\n')
-            print "\n\n"
+            print((join(lOutput, '\n')))
+            print("\n\n")
 
     if options.keys:
         lActiveKeys = EqualTempered.parseNotesToOffsets(options.keys, 0)
@@ -1934,26 +1932,30 @@ def main():
 
     # Are we pulling fingercharts for whatever instruments?
 
-    lSequences = join(args).split(',')
+    lSequences = ', '.join(args).split(',')
     if len(args) >= 1:
         lOutput = []
         if not options.chordsOnly:  
             for key in lActiveKeys:
                 lMatches, root = ParseNoteSequences( lSequences, key, lActiveScales )
                 if len(lMatches) > 0:
-                    lOutput.append(join([s.shortList(root) for s in lMatches], '\n\t'))
+                    lOutput.append(', '.join([s.shortList(root) for s in lMatches]))
+                    print("\n\t")
 
             if len(lOutput):
-                print "Matches scales:\n\t%s" % (join(lOutput, '\n\t'))
-                print
+                print("Matches scales:\n\t")
+                print(', '.join(lOutput))
+                print("\n\t")
+                print()
 
             for scale in lMatches:
                 for instrument in lInstruments:
-                    print scale.shortList(key)
+                    print(scale.shortList(key))
+                    print("\n")
                     if options.intervals:
-                        print instrument.playIntervals(scale, key, options.numFrets)
+                        print((instrument.playIntervals(scale, key, options.numFrets)))
                     else:
-                        print instrument.play(scale, key, options.numFrets)
+                        print((instrument.play(scale, key, options.numFrets)))
 
         for lNotes in lSequences:
             if len(lNotes) <= 1:    continue
@@ -1966,28 +1968,28 @@ def main():
                     
                         if options.fingercharts:
                             for scale in lMatches:
-                                print scale.shortList(key)
+                                print((scale.shortList(key)))
                                 for instrument in lInstruments:
                                     if options.intervals:
-                                        print instrument.playIntervals(scale, key, options.numFrets)
+                                        print((instrument.playIntervals(scale, key, options.numFrets)))
                                     else:
-                                        print instrument.play(scale, key, options.numFrets)
+                                        print((instrument.play(scale, key, options.numFrets)))
 
                 if len(lOutput):
-                    print "Matches chords:\n\t%s" % (join(lOutput, '\n\t'))
+                    print(("Matches chords:\n\t%s" % (join(lOutput, '\n\t'))))
 
-        print
+        print()
 
     elif options.fingercharts:
         key = lActiveKeys[0]
         lMatches = lActiveScales
         for scale in lMatches:
-            print scale.shortList(key)
+            print((scale.shortList(key)))
             for instrument in lInstruments:
                 if options.intervals:
-                    print instrument.playIntervals(scale, key, options.numFrets)
+                    print((instrument.playIntervals(scale, key, options.numFrets)))
                 else:
-                    print instrument.play(scale, key, options.numFrets)
+                    print((instrument.play(scale, key, options.numFrets)))
                    
     if options.shell:    
         if not oParentScale:
