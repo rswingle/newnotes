@@ -8,9 +8,6 @@ TODO:
 Fix output formatting
 
 ------------------------------------------
-
-Example usage: ./newnotes.py E,A,B
-
 ```
 Usage: newnotes.py [options]
 Options:
@@ -43,3 +40,27 @@ Options:
   --fractional=FRACTIONAL
                         Make a fractional scale with denominator up to this
 ```
+
+```Example Usage "./newnotes.py E,A,B" will produce:
+Matches scales:
+        C major              C  D  E  F  G  A  B  C
+        Db minor             Db Eb E  Gb Ab A  B  Db
+        D major              D  E  Gb G  A  B  Db D
+        D major pentatonic   D  E  Gb A  B  D
+        E major              E  Gb Ab A  B  Db Eb E
+        E major minor        E  Gb Ab A  B  C  D  E
+        E minor              E  Gb G  A  B  C  D  E
+        E minor pentatonic   E  G  A  B  D  E
+        Gb minor             Gb Ab A  B  Db D  E  Gb
+        Gb minor pentatonic  Gb A  B  Db E  Gb
+        G major              G  A  B  C  D  E  Gb G
+        G major pentatonic   G  A  B  D  E  G
+        A major              A  B  Db D  E  Gb Ab A
+        A major minor        A  B  Db D  E  F  G  A
+        A major pentatonic   A  B  Db E  Gb A
+        A minor              A  B  C  D  E  F  G  A
+        B major minor        B  Db Eb E  Gb G  A  B
+        B minor              B  Db D  E  Gb G  A  B
+        B minor pentatonic   B  D  E  Gb A  B
+```
+
