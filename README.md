@@ -5,7 +5,11 @@ This is a python script originally developed by Daniel Rollings to aid in findin
 Requirements: python3
 
 TODO:
-Fix output formatting
+- Redo scales to use new intervalParse for construction
+- Implement mode bitshifts
+- Fix buggy fingercharts for harmonic grid
+
+
 
 ------------------------------------------
 ```
