@@ -1939,19 +1939,19 @@ def main():
             for key in lActiveKeys:
                 lMatches, root = ParseNoteSequences( lSequences, key, lActiveScales )
                 if len(lMatches) > 0:
-                    lOutput.append(' '.join([s.shortList(root) for s in lMatches]))
-                    print("\n\t")
+                    lOutput.append('\n'.join([s.shortList(root) for s in lMatches]))
+                    #print("\n\t")
 
             if len(lOutput):
                 print("Matches scales:\n\t")
-                print('\n'.join(lOutput),'\n')
+                print('\n'.join(lOutput))
                 #print("\n\t")
                 #print()
 
             for scale in lMatches:
                 for instrument in lInstruments:
                     print(scale.shortList(key),'\n')
-                    #print("\n\t")
+                    print("\n\t")
                     #print()
                     if options.intervals:
                         print((instrument.playIntervals(scale, key, options.numFrets), '\n\t'))
